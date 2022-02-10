@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import AuthSession from './auth_session.entity';
 import BaseEntity from './base.entity';
 
 @Entity()
