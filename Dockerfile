@@ -1,7 +1,7 @@
 # DEVELOPMENT
 FROM node:16-alpine3.15 as development
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/auth
 
 COPY package.json ./
 COPY package-lock.json ./
@@ -19,9 +19,9 @@ FROM node:16-alpine3.15 AS production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /auth
+WORKDIR /usr/src/auth
 
-COPY --from=development / /auth
+COPY --from=development / /usr/src/auth
 
 # EXPOSING PORT FOR OUTER WORLD
 EXPOSE 8040
