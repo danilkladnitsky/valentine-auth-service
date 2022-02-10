@@ -9,15 +9,15 @@ export default class User extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column()
   avatar_url: string;
 
-  @Column({ nullable: true })
-  email: string;
-
-  @Column({ nullable: true })
+  @Column()
   nickname: string;
 
-  @Column({ nullable: true })
+  @Column()
+  email: string;
+
+  @Column()
   birthdate: string;
 }

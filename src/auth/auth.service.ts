@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import AuthSession from 'src/entities/auth_session.entity';
 import User from 'src/entities/user.entity';
+import { generateBearerToken } from 'src/utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -72,9 +73,13 @@ export class AuthService {
         },
       );
 
-      await this.saveAuthSession({ ...res.data });
+      const user = { ...res.data };
 
-      return await this.saveUser(res.data);
+      await this.saveAuthSession({ ...user });
+
+      const userEntityAPI = await this.saveUser(user);
+
+      return { ...userEntityAPI, token: generateBearerToken(user) };
     } catch (err) {
       console.log(err);
       this.saveAuthSession({});
@@ -91,14 +96,14 @@ export class AuthService {
   }
 
   async saveUser(user: User) {
-    const existingUser = await this.userRepository.find({ isu: user.isu });
+    const existingUser = await this.userRepository.findOne({ isu: user.isu });
 
-    const userExists = Boolean(existingUser.length);
-
-    if (userExists) {
+    if (existingUser) {
       return existingUser;
     }
 
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+
+    return await this.userRepository.findOne({ isu: user.isu });
   }
 }
