@@ -1,20 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import BaseEntity from './user.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
+import User from './user.entity';
+import BaseEntity from './base.entity';
 
 @Entity()
 export default class AuthSession extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  isu: number;
-
-  @Column()
-  name: string;
-
   @Column()
   status: boolean;
 
-  @Column()
-  email: string;
+  @Column({ nullable: true })
+  isu: number;
 
-  @Column()
-  ip: string;
+  @ManyToOne(() => User, (user) => user.isu)
+  user: User;
 }

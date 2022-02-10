@@ -2,8 +2,8 @@ import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
 
-@Controller('auth')
-@ApiTags('auth')
+@Controller('/')
+@ApiTags('/')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
@@ -25,7 +25,7 @@ export class AppController {
     return await this.appService.getUserByToken(access_token);
   }
 
-  @Get('/user')
+  @Get('/auth')
   async getUser(@Query('code') code: string) {
     if (!code) {
       throw new BadRequestException();

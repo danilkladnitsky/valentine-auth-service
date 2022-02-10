@@ -1,16 +1,27 @@
-import { Column } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
+import AuthSession from './auth_session.entity';
 import BaseEntity from './base.entity';
 
+@Entity()
 export default class User extends BaseEntity {
   @Column()
   isu: number;
 
   @Column()
-  gender: string;
+  name: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar_url: string;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
+
+  @Column({ nullable: true })
+  nickname: string;
+
+  @Column({ nullable: true })
+  birthdate: string;
+
+  @OneToMany(() => AuthSession, (AuthSession) => AuthSession.user)
+  AuthSessions: AuthSession[];
 }

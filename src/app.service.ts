@@ -3,10 +3,19 @@ import {
   Injectable,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
+import { Repository } from 'typeorm';
+import AuthSession from './entities/auth_session.entity';
+import User from './entities/user.entity';
 
 @Injectable()
 export class AppService {
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(AuthSession)
+    private readonly authRepository: Repository<AuthSession>,
+  ) {}
   async getToken(code: string): Promise<string> {
     try {
       const { CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, REDIRECT_URI } =
@@ -58,13 +67,41 @@ export class AppService {
       Authorization: `Bearer ${access_token}`,
     };
 
-    const res = await axios.get(
-      'https://login.itmo.ru/auth/realms/itmo/protocol/openid-connect/userinfo',
-      {
-        headers,
-      },
+    try {
+      const res = await axios.get(
+        'https://login.itmo.ru/auth/realms/itmo/protocol/openid-connect/userinfo',
+        {
+          headers,
+        },
+      );
+
+      this.saveAuthSession({ ...res.data });
+
+      this.saveUser(res.data);
+
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      this.saveAuthSession({});
+
+      throw new BadRequestException();
+    }
+  }
+
+  async saveAuthSession(session: Partial<AuthSession>) {
+    await this.authRepository.save({
+      status: Boolean(session.isu),
+      isu: session.isu,
+    });
+  }
+
+  async saveUser(user: User) {
+    const userExists = Boolean(
+      (await this.userRepository.find({ isu: user.isu })).length,
     );
 
-    return res.data;
+    if (!userExists) {
+      this.userRepository.save(user);
+    }
   }
 }
