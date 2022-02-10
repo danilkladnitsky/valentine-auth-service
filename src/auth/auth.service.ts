@@ -7,6 +7,8 @@ import User from 'src/entities/user.entity';
 import { generateBearerToken } from 'src/utils';
 import { Repository } from 'typeorm';
 
+const StatsD = require('hot-shots');
+const dogstatsd = new StatsD();
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,6 +17,8 @@ export class AuthService {
     private readonly authRepository: Repository<AuthSession>,
   ) {}
   async getToken(code: string): Promise<string> {
+    dogstatsd.increment('itmo-auth.sign_in_attempts');
+
     try {
       const { CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, REDIRECT_URI } =
         process.env;
@@ -52,6 +56,7 @@ export class AuthService {
       return access_token as string;
     } catch (err) {
       console.log(err);
+      dogstatsd.increment('itmo-auth.token_not_received');
       throw new RpcException('Cant get token');
     }
   }
@@ -82,6 +87,7 @@ export class AuthService {
       return { ...userEntityAPI, token: generateBearerToken(user) };
     } catch (err) {
       console.log(err);
+      dogstatsd.increment('itmo-auth.user_profile_not_received');
       this.saveAuthSession({});
 
       throw new RpcException('Invalid user');
@@ -89,6 +95,7 @@ export class AuthService {
   }
 
   async saveAuthSession(session: Partial<AuthSession>) {
+    dogstatsd.increment('auth.sessions');
     await this.authRepository.save({
       status: Boolean(session.isu),
       isu: session.isu,
@@ -101,6 +108,8 @@ export class AuthService {
     if (existingUser) {
       return existingUser;
     }
+
+    dogstatsd.increment('users.unique');
 
     await this.userRepository.save(user);
 

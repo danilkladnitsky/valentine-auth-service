@@ -12,8 +12,6 @@ export class UserController {
 
   @MessagePattern('get.users')
   async getUsers() {
-    console.log('get.users');
-
     return await this.userService.getUsers();
   }
 }
