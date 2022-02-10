@@ -9,7 +9,4 @@ export default class AuthSession extends BaseEntity {
 
   @Column({ nullable: true })
   isu: number;
-
-  @ManyToOne(() => User, (user) => user.isu)
-  user: User;
 }

@@ -75,9 +75,9 @@ export class AppService {
         },
       );
 
-      this.saveAuthSession({ ...res.data });
+      await this.saveUser(res.data);
 
-      this.saveUser(res.data);
+      await this.saveAuthSession({ ...res.data });
 
       return res.data;
     } catch (err) {

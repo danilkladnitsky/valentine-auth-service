@@ -21,7 +21,4 @@ export default class User extends BaseEntity {
 
   @Column({ nullable: true })
   birthdate: string;
-
-  @OneToMany(() => AuthSession, (AuthSession) => AuthSession.user)
-  AuthSessions: AuthSession[];
 }
