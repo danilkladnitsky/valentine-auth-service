@@ -9,15 +9,18 @@ export default class User extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({
+    default:
+      'https://www.seekpng.com/png/detail/428-4287240_no-avatar-user-circle-icon-png.png',
+  })
   avatar_url: string;
 
-  @Column()
+  @Column({ default: 'no_nickname' })
   nickname: string;
 
   @Column()
   email: string;
 
-  @Column()
+  @Column({ default: 'no_birthdate' })
   birthdate: string;
 }
