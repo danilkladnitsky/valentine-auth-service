@@ -23,7 +23,4 @@ WORKDIR /usr/src/auth
 
 COPY --from=development / /usr/src/auth
 
-# EXPOSING PORT FOR OUTER WORLD
-EXPOSE 8040
-
 CMD [ "node", "dist/main" ]
